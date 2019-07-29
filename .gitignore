@@ -1,0 +1,15 @@
+.ipynb_checkpoints
+.classpath
+.project
+*.swp
+__pycache__
+
+/batch_inputs
+/*.log
+/did.json
+/did.txt
+/english_1990
+/temp/*
+/outputs
+/event_extractor/stanford-corenlp-full-2018-10-05
+/event_extractor/EventEntityExtractor
