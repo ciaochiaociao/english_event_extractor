@@ -28,8 +28,8 @@ OUTPUT_FOLDER = os.path.join(ALL_OUTPUTS_FOLDER, 'output')
 MD_FOLDER = os.path.join(ALL_OUTPUTS_FOLDER, 'multi_doc')
 CORENLP_INPUT_FOLDER = 'temp'
 
-def stanfordcorenlp_command(path2corenlp, inputfile) -> str:
-    return "java -cp " + os.path.join(path2corenlp, "*") + " -Xmx8g edu.stanford.nlp.pipeline.StanfordCoreNLP " + " -annotators tokenize,ssplit,pos,depparse,lemma,ner,parse " + " -ner.applyFineGrained false " + " -file " + inputfile + " -outputFormat json "
+def stanfordcorenlp_command(path2corenlp, inputfile, memory='16g') -> str:
+    return "java -cp " + os.path.join(path2corenlp, "*") + " -Xmx%s edu.stanford.nlp.pipeline.StanfordCoreNLP " % memory + " -annotators tokenize,ssplit,pos,depparse,lemma,ner,parse " + " -ner.applyFineGrained false " + " -file " + inputfile + " -outputFormat json "
 
 
 @logtime('info')
