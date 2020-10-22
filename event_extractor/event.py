@@ -207,7 +207,7 @@ class Event:
         # add fullid
         out = OrderedDict()
         for ordered_event in ordered_e_l:
-            fullid = 'D' + str(ordered_event['did']) + '-S' + str(ordered_event['sid']) + '-EVM' + str(ordered_event['id'])
+            fullid = 'D' + 'tempfile' + '-S' + str(ordered_event['sid']) + '-EVM' + str(ordered_event['id'])
             
             # don't output these redundant attributes
             ordered_event.pop('did')
