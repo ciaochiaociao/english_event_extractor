@@ -176,7 +176,7 @@ class Event:
 
         for event in e_l:
             ordered_event = OrderedDict()
-            for key in ['doc', 'id', 'sid', 'did', 'cid', 'abs_id', 'type', 'subtype','s_text', 'trigger', 'args']:
+            for key in ['did', 'id', 'sid', 'type', 'subtype','s_text', 'trigger', 'args']:
                 if key in event.__dict__.keys():
                     ordered_event.update({key: event.__dict__[key]})
             ordered_e_l.append(ordered_event)
@@ -189,7 +189,7 @@ class Event:
             if len(event['args']) != 0:
                 for arg in event['args']:
                     ordered_arg = OrderedDict()
-                    for key in ['sid', 'role', 'text', 'token_b', 'token_e', 'char_b', 'char_e', 'ner']:
+                    for key in ['role', 'text', 'char_b', 'char_e', 'ner']:
                         if key in arg.keys():
                             ordered_arg.update({key: arg[key]})
                     args.append(ordered_arg)
@@ -198,7 +198,7 @@ class Event:
         # sort trigger attributes
 
         for event in ordered_e_l:
-            attrs = ['text', 'token_b', 'token_e', 'char_b', 'char_e']
+            attrs = ['text', 'char_b', 'char_e']
             ordered_attr = OrderedDict()
             for attr in attrs:
                 ordered_attr.update({attr: event['trigger'][attr]})
@@ -208,6 +208,11 @@ class Event:
         out = OrderedDict()
         for ordered_event in ordered_e_l:
             fullid = 'D' + str(ordered_event['did']) + '-S' + str(ordered_event['sid']) + '-EVM' + str(ordered_event['id'])
+            
+            # don't output these redundant attributes
+            ordered_event.pop('did')
+            ordered_event.pop('id')
+            
             out.update({fullid: ordered_event})
-
+            
         return out
