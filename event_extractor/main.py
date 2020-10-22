@@ -28,8 +28,14 @@ OUTPUT_FOLDER = os.path.join(ALL_OUTPUTS_FOLDER, 'output')
 MD_FOLDER = os.path.join(ALL_OUTPUTS_FOLDER, 'multi_doc')
 CORENLP_INPUT_FOLDER = 'temp'
 
-def stanfordcorenlp_command(path2corenlp, inputfile, memory='16g') -> str:
-    return "java -cp " + os.path.join(path2corenlp, "*") + " -Xmx%s edu.stanford.nlp.pipeline.StanfordCoreNLP " % memory + " -annotators tokenize,ssplit,pos,depparse,lemma,ner,parse " + " -ner.applyFineGrained false " + " -file " + inputfile + " -outputFormat json "
+def stanfordcorenlp_command(path2corenlp, inputfile, memory='16g', use_server=True, server_address="http://140.109.19.191:9000") -> str:
+    if use_server:
+        from pathlib import Path
+        print('Running CoreNLP on', server_address)
+        outputfile = str(Path(inputfile).with_suffix('.json').name)
+        return 'wget --post-file {} \'{}/?properties={{"outputFormat":"json","annotators":"tokenize,ssplit,pos,depparse,lemma,ner,parse","ner.applyFineGrained":"false"}}\' -O {}'.format(inputfile, server_address, outputfile)
+    else:
+        return "java -cp " + os.path.join(path2corenlp, "*") + " -Xmx%s edu.stanford.nlp.pipeline.StanfordCoreNLP " % memory + " -annotators tokenize,ssplit,pos,depparse,lemma,ner,parse " + " -ner.applyFineGrained false " + " -file " + inputfile + " -outputFormat json "
 
 
 @logtime('info')
