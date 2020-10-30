@@ -28,10 +28,10 @@ for data_file in $DATA_PATH/*; do
 #     python3 main.py $fp > /dev/null 2>&1
     python3 main.py "$fp" 1>> stdout.log 2>> stderr.log
     echo 'generation of required files: done'
-    cd $EEE_PATH
+    cd "$EEE_PATH" || exit
     ./Release/JEE
     echo 'event entity extraion: done'
-    cd $CUR_PATH
+    cd "$CUR_PATH" || exit
     mv ./EventEntityExtractor/output/joint.results.txt ./output/${fp}.event.entity
     rm $fp
     mv $fp.json corenlp_jsons/
