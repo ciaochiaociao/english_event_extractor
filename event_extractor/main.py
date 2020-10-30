@@ -5,12 +5,12 @@ import re
 import shlex
 import os
 import shutil
-from typing import Tuple
 import subprocess
-from event_extractor.utils import logtime
 import logging
-from event_extractor.event import *
-from event_extractor.utils import lprint
+from typing import Tuple
+
+from .utils import logtime
+from .event import *
 
 # set up loggers
 logger = logging.getLogger(__name__)

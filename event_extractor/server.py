@@ -1,7 +1,8 @@
 #!/usr/bin/python3
-from flask import Flask, request
 import json
 from pathlib import Path
+from flask import Flask, request
+
 from .main import EventExtractor
 from .event import Event
 

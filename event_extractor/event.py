@@ -1,7 +1,8 @@
 # coding: utf-8
 from typing import List, Dict
 from collections import OrderedDict
-from event_extractor.utils import lprint
+
+from .utils import lprint
 
 
 def read_doc_id_list(doc_id_list: str) -> Dict[str, str]:
