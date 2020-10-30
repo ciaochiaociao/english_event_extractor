@@ -127,7 +127,7 @@ class EventExtractor:
                 sentence = ""
                 attr = {'naryTree': "", 'words': [], 'posTags': [], 'lemmas': []}
 
-                naryTree = re.sub("\s\s+", " ", data['sentences'][i]['parse'])
+                naryTree = re.sub(r"\s\s+", " ", data['sentences'][i]['parse'])
                 attr['naryTree'] = naryTree
 
                 for j, tok in enumerate(data['sentences'][i]['tokens']):
