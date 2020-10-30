@@ -4,7 +4,7 @@ from pathlib import Path
 from flask import Flask, request
 
 from .main import EventExtractor
-from .event import Event
+from .event import to_multidoc_dict
 
 app = Flask(__name__)
 
@@ -30,7 +30,7 @@ def get_event():
     doc_id_dict = {temp_id: 'temp'}
 
     events = EventExtractor.extract(doc_id_dict)
-    events_dict = Event.to_multidoc_dict(events)
+    events_dict = to_multidoc_dict(events)
     result = {
         'corefs': {},
         'events': events_dict

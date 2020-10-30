@@ -103,11 +103,11 @@ class EventExtractor:
         os.chdir(CWD)
 
         # Read Event File
-        event = Event.read_event_file(OUTPUT_FILE, CORENLP_STORE_FILE, doc_id_dict)
+        event = read_event_file(OUTPUT_FILE, CORENLP_STORE_FILE, doc_id_dict)
 
         # write to JSON file
         with open(JSON_OUTPUT_FILE, 'w') as f:
-            json.dump(Event.to_multidoc_dict(event), f)
+            json.dump(to_multidoc_dict(event), f)
 
         return event
 
