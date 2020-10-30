@@ -1,0 +1,3 @@
+[submodule "event_extractor/EventEntityExtractor"]
+	path = event_extractor/EventEntityExtractor
+	url = https://github.com/bishanyang/EventEntityExtractor.git
