@@ -7,15 +7,13 @@ import os
 import shutil
 from typing import Tuple
 import subprocess
-from event_extractor.utils import setup_logger, logtime
+from event_extractor.utils import logtime
 import logging
 from event_extractor.event import *
 from event_extractor.utils import lprint
 
 # set up loggers
-debug_logger = setup_logger('debug', 'debug.log', level=logging.DEBUG)
-info_logger = setup_logger('info', 'info.log', level=logging.INFO)
-error_logger = setup_logger('error', 'error.log', level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 FILE_DIR_PATH = os.path.dirname(os.path.abspath(__file__))
 
@@ -40,7 +38,7 @@ def stanfordcorenlp_command(path2corenlp, inputfile, memory='16g', use_server=Tr
                                           "*") + " -Xmx%s edu.stanford.nlp.pipeline.StanfordCoreNLP " % memory + " -annotators tokenize,ssplit,pos,depparse,lemma,ner,parse " + " -ner.applyFineGrained false " + " -file " + inputfile + " -outputFormat json "
 
 
-@logtime('info')
+@logtime(__name__)
 def corenlp_gen_data(docID_list) -> dict:
     # note that the author (Bishan Yang) use version 3.6
     path2corenlp = os.path.join(FILE_DIR_PATH, "stanford-corenlp-full-2018-10-05")  # ver. 3.9.2
@@ -52,7 +50,7 @@ def corenlp_gen_data(docID_list) -> dict:
                                       os.path.join(CORENLP_INPUT_FOLDER, str(docID)))  # store file as <docID>.json
         args = shlex.split(cmd)
         ret = subprocess.check_output(args)  # ignore return
-        info_logger.info(ret)
+        logger.info(ret)
         with open(str(docID) + ".json", 'r') as f:
             data_dict[docID] = json.load(f)
 
@@ -64,7 +62,7 @@ class EventExtractor:
     EEE_OUTPUT_FILE = os.path.join(FILE_DIR_PATH, 'EventEntityExtractor/output/joint.results.txt')
 
     @staticmethod
-    @logtime('info')
+    @logtime(__name__)
     def extract(doc_id_dict: Dict[int, str]) -> List[Event]:
 
         docID_list = list(doc_id_dict.keys())
@@ -94,9 +92,9 @@ class EventExtractor:
         # logging
         if stdout:
             print('stdout: ', stdout.decode('utf-8'))
-            info_logger.info('[docID]: ' + str(id_) + ' [stdout]: ' + stdout.decode('utf-8'))
+            logger.info('[docID]: ' + str(id_) + ' [stdout]: ' + stdout.decode('utf-8'))
         if stderr:
-            error_logger.error('[docID]: ' + str(id_) + ' [stderr]: ' + stderr.decode('utf-8'))
+            logger.error('[docID]: ' + str(id_) + ' [stderr]: ' + stderr.decode('utf-8'))
 
         # copy the output file to the cwd
         shutil.move(EventExtractor.EEE_OUTPUT_FILE, OUTPUT_FILE)
@@ -114,7 +112,7 @@ class EventExtractor:
         return event
 
     @staticmethod
-    @logtime('info')
+    @logtime(__name__)
     def get_text_attr(data_dict) -> Tuple[dict, dict]:
         text_dict, attr_dict = {}, {}
 
@@ -149,7 +147,7 @@ class EventExtractor:
         return text_dict, attr_dict
 
     @staticmethod
-    @logtime('info')
+    @logtime(__name__)
     def gen_ace_test_conll(attr_dict, docID_list):
         """Write to <EEE_INPUT_PATH>/ace.test.conll"""
         with open(os.path.join(EventExtractor.EEE_INPUT_PATH, "ace.test.conll"), 'w') as f:
@@ -188,7 +186,7 @@ class EventExtractor:
                 f.write("#end document\n")
 
     @staticmethod
-    @logtime('info')
+    @logtime(__name__)
     def gen_stanford_ner(data_dict, docID_list):
         """Write to <EEE_INPUT_PATH>/ace.test.stanford.ner.txt"""
         with open(os.path.join(EventExtractor.EEE_INPUT_PATH, "ace.test.stanford.ner.txt"), 'w') as f:
@@ -202,7 +200,7 @@ class EventExtractor:
                         f.write(line)
 
     @staticmethod
-    @logtime('info')
+    @logtime(__name__)
     def gen_stanford_dep(data_dict, docID_list):
         """Write to <EEE_INPUT_PATH>/ace.test.dependencies.txt"""
         with open(os.path.join(EventExtractor.EEE_INPUT_PATH, "ace.test.dependencies.txt"), 'w') as f:
