@@ -3,6 +3,9 @@
 .project
 *.swp
 __pycache__
-/outputs
+
 /event_extractor/stanford-corenlp-full-2018-10-05
 /event_extractor/EventEntityExtractor
+
+/outputs
+/tmp
