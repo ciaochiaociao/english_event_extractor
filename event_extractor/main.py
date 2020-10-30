@@ -65,7 +65,7 @@ class EventExtractor:
 
     @staticmethod
     @logtime('info')
-    def extract(doc_id_dict: Dict[str, str]) -> Event:
+    def extract(doc_id_dict: Dict[int, str]) -> List[Event]:
 
         docID_list = list(doc_id_dict.keys())
         id_ = docID_list[0]
