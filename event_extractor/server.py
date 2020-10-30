@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-from flask import Flask, abort, request
+from flask import Flask, request
 import json
-import io
 from pathlib import Path
 from .main import EventExtractor
 from .event import Event
@@ -13,10 +12,10 @@ app = Flask(__name__)
 def index():
     return "Hello, this is an English Event Extractor API! Please access the url with <ip:port>/event?text=<text>\n"
 
+
 @app.route('/event', methods=['GET'])
 def get_event():
 
-    
     text = request.args.get('text')
     
     temp_dir = Path('temp')

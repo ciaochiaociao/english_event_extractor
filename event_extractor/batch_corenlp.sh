@@ -3,7 +3,7 @@ counter=0
 CUR_PATH=$PWD
 EEE_PATH=./EventEntityExtractor
 if [ -f *.log ]; then
-    rm *.log
+    rm ./*.log
 fi
 
 if [ $# -eq 1 ]
@@ -23,7 +23,7 @@ for data_file in $DATA_PATH/*; do
     counter=$((counter+1))
     echo '===' $counter - $fp '==='
 #     python3 main.py $fp > /dev/null 2>&1
-    python3 main.py $fp 1>> stdout.log 2>> stderr.log
+    python3 main.py "$fp" 1>> stdout.log 2>> stderr.log
     echo 'generation of required files: done'
     cd $EEE_PATH
     ./Release/JEE

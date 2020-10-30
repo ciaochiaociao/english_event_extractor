@@ -1,76 +1,74 @@
+# coding: utf-8
 from typing import List, Dict
 from collections import OrderedDict
 from event_extractor.utils import lprint
 
-# coding: utf-8
 
 def read_doc_id_list(doc_id_list: str) -> Dict[int, str]:
     import csv
     with open(doc_id_list, 'r') as f:
         did_ = dict([[col[0], col[1]] for col in csv.reader(f, delimiter='\t')])
-    
+
     return did_
+
 
 class Event:
     def __init__(self):
         self.doc = None
         self.did = None
-        self.sid = None        
+        self.sid = None
         self.id = None
         self.abs_id = None
-        self.event_type = None # event type
-        self.event_word = None # event word
-        self.role_type = [] # role type
-        self.role_word = [] # role word
-        self.event_attr = [] # [sid, token_b, token_e]
-        self.role_attr = [] # [sid, token_b, token_e, e_type]
+        self.event_type = None  # event type
+        self.event_word = None  # event word
+        self.role_type = []  # role type
+        self.role_word = []  # role word
+        self.event_attr = []  # [sid, token_b, token_e]
+        self.role_attr = []  # [sid, token_b, token_e, e_type]
         self.role_char_b = []
         self.role_char_e = []
-    
+
     @staticmethod
     def read_event_file(output_file: str, corenlp_json_file: str, doc_id_dict: dict) -> List['Event']:
         import json
-        import re
-        import csv
 
         print(output_file)
         # put into Event structure
         event_list = []
         doc = {}
         # main program
-        with open(output_file) as f:
+        with open(output_file) as fh:
             init, has_event = True, True
             cur_event = None
 
-            for line in f:
+            for line in fh:
 
-                if line == "\n": # The end of lines an event
+                if line == "\n":  # The end of lines an event
                     init = True
-                    if cur_event != None:
+                    if cur_event is not None:
                         event_list.append(cur_event)
                         cur_event = None
 
-
-                elif init: # The begining of an event (Trigger line)
+                elif init:  # The begining of an event (Trigger line)
                     init = False
                     line = (line.rstrip("\n")).split("\t")
-                    event_type = line[1] # EventType
+                    event_type = line[1]  # EventType
 
-                    if event_type == "O": # no event
+                    if event_type == "O":  # no event
                         has_event = False
                     else:
                         cur_event = Event()
                         has_event = True
                         assert len(line[0].split("#")) == 4
                         [docID, sid, token_b, token_e] = line[0].split("#")
-                        
+
                         # fix the bug of flie names with ) at the end in the event extraction program
                         if '(' in docID and ')' not in docID:
                             docID += ')'
 
                         if docID not in doc:
-                            with open(corenlp_json_file, 'r') as f:
-                                data = json.load(f)
+                            with open(corenlp_json_file, 'r') as _f:
+                                data = json.load(_f)
 
                             plain_text = []
                             for i in range(0, len(data['sentences'])):
@@ -95,22 +93,26 @@ class Event:
                         cur_event.did = int(docID)
                         cur_event.sid = int(sid)
                         cur_event.event_type = event_type
-                        cur_event.event_word = ' '.join(text_tok[int(sid)][int(token_b):int(token_e)+1])
-                        cur_event.event_attr = [int(sid), int(token_b), int(token_e), data['sentences'][int(sid)]['tokens'][int(token_b)]['characterOffsetBegin'], data['sentences'][int(sid)]['tokens'][int(token_e)]['characterOffsetEnd']]
+                        cur_event.event_word = ' '.join(text_tok[int(sid)][int(token_b):int(token_e) + 1])
+                        cur_event.event_attr = [int(sid), int(token_b), int(token_e),
+                                                data['sentences'][int(sid)]['tokens'][int(token_b)]['characterOffsetBegin'],
+                                                data['sentences'][int(sid)]['tokens'][int(token_e)]['characterOffsetEnd']]
 
-                elif has_event == True: # the following lines of an event (Roles line)
+                elif has_event:  # the following lines of an event (Roles line)
                     line = (line.rstrip("\n")).split("\t")
                     role_type = line[1]
                     cur_event.s_text = plain_text[int(line[0].split('#')[1])]
 
                     if role_type != "O":
                         assert len(line[0].split('#')) == 5
-                        [docID, sid, token_b, token_e, e_type] = line[0].split('#')
+                        docID, sid, token_b, token_e, e_type = line[0].split('#')
                         cur_event.role_type.append(role_type)
-                        cur_event.role_word.append(' '.join(text_tok[int(sid)][int(token_b):int(token_e)+1]))
+                        cur_event.role_word.append(' '.join(text_tok[int(sid)][int(token_b):int(token_e) + 1]))
                         cur_event.role_attr.append([int(sid), int(token_b), int(token_e), e_type])
-                        cur_event.role_char_b.append(data['sentences'][int(sid)]['tokens'][int(token_b)]['characterOffsetBegin'])
-                        cur_event.role_char_e.append(data['sentences'][int(sid)]['tokens'][int(token_e)]['characterOffsetEnd'])
+                        cur_event.role_char_b.append(
+                            data['sentences'][int(sid)]['tokens'][int(token_b)]['characterOffsetBegin'])
+                        cur_event.role_char_e.append(
+                            data['sentences'][int(sid)]['tokens'][int(token_e)]['characterOffsetEnd'])
 
         # add more attributes
         from collections import OrderedDict
@@ -145,7 +147,7 @@ class Event:
             event.trigger = OrderedDict({
                 'text': event.event_word,
                 'token_b': event.event_attr[1],
-                'token_e': event.event_attr[2]+1,
+                'token_e': event.event_attr[2] + 1,
                 'char_b': event.event_attr[3],
                 'char_e': event.event_attr[4]
             })
@@ -153,14 +155,14 @@ class Event:
             event.args = []
             for role in list(zip(event.role_word, event.role_type, event.role_attr, event.role_char_b, event.role_char_e)):
                 event.args.append(OrderedDict({
-                 'sid': role[2][0],
-                 'role': role[1],
-                'text': role[0],
-                'ner': role[2][3],
-                 'token_b': role[2][1],
-                 'token_e': role[2][2]+1,
-                'char_b': role[3],
-                'char_e': role[4]
+                    'sid': role[2][0],
+                    'role': role[1],
+                    'text': role[0],
+                    'ner': role[2][3],
+                    'token_b': role[2][1],
+                    'token_e': role[2][2] + 1,
+                    'char_b': role[3],
+                    'char_e': role[4]
 
                 }))
         return e_l
@@ -176,7 +178,7 @@ class Event:
 
         for event in e_l:
             ordered_event = OrderedDict()
-            for key in ['did', 'id', 'sid', 'type', 'subtype','s_text', 'trigger', 'args']:
+            for key in ['did', 'id', 'sid', 'type', 'subtype', 's_text', 'trigger', 'args']:
                 if key in event.__dict__.keys():
                     ordered_event.update({key: event.__dict__[key]})
             ordered_e_l.append(ordered_event)
@@ -208,11 +210,11 @@ class Event:
         out = OrderedDict()
         for ordered_event in ordered_e_l:
             fullid = 'D' + 'tempfile' + '-S' + str(ordered_event['sid']) + '-EVM' + str(ordered_event['id'])
-            
+
             # don't output these redundant attributes
             ordered_event.pop('did')
             ordered_event.pop('id')
-            
+
             out.update({fullid: ordered_event})
-            
+
         return out

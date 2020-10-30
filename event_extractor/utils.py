@@ -1,4 +1,5 @@
-import logging, time
+import logging
+import time
 
 
 def setup_logger(name, log_file, level=logging.INFO):
