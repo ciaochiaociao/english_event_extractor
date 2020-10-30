@@ -4,10 +4,10 @@ from collections import OrderedDict
 from event_extractor.utils import lprint
 
 
-def read_doc_id_list(doc_id_list: str) -> Dict[int, str]:
+def read_doc_id_list(doc_id_list: str) -> Dict[str, str]:
     import csv
     with open(doc_id_list, 'r') as f:
-        did_ = dict([[col[0], col[1]] for col in csv.reader(f, delimiter='\t')])
+        did_ = dict([(col[0], col[1]) for col in csv.reader(f, delimiter='\t')])
 
     return did_
 
