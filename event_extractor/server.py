@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 from flask import Flask, request
+from werkzeug.exceptions import HTTPException
 
 from .main import EventExtractor
 from .event import to_multidoc_dict
@@ -14,11 +15,15 @@ def index():
     return "Hello, this is an English Event Extractor API! Please access the url with <ip:port>/event?text=<text>\n"
 
 
-@app.route('/event', methods=['GET'])
+@app.route('/event', methods=['POST', 'GET'])
 def get_event():
+    if request.method == 'GET':
+        text = request.args.get('text')
+    elif request.method == 'POST':
+        text = request.form['text']
+    else:
+        raise HTTPException
 
-    text = request.args.get('text')
-    
     temp_dir = Path('temp')
     temp_dir.mkdir(exist_ok=True)
     
