@@ -2,9 +2,12 @@
 counter=0
 CUR_PATH=$PWD
 EEE_PATH=./EventEntityExtractor
-if [ -f *.log ]; then
-    rm ./*.log
-fi
+for file in *.log
+do
+  if [ -f "$file" ]; then
+      rm ./*.log
+  fi
+done
 
 if [ $# -eq 1 ]
 then
